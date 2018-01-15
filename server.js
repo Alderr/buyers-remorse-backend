@@ -38,7 +38,8 @@ app.get("/v2/profit", function (request, response) {
   }
 
   var { coinName, investmentAmount, date } = request.query;
-
+  
+  res.status(204).end();
 });
 
 app.get('/coinNames', (req, res) => {
