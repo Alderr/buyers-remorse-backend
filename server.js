@@ -27,7 +27,7 @@ app.get("/v1/profit", function (request, response) {
 
 });
 
-app.get("v2/profit", function (request, response) {
+app.get("/v2/profit", function (request, response) {
 
   let requiredQueryNames = ['coinName', 'investmentAmount', 'date'];
 
