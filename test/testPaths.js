@@ -11,7 +11,6 @@ describe('GET / HOME ENDPOINT', () => {
     return chai.request(app)
       .get('/')
       .then( (response) => {
-        console.log(response);
         response.should.have.status(200);
       });
   })

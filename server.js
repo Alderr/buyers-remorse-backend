@@ -38,7 +38,7 @@ app.get("/v2/profit", function (request, response) {
   }
 
   var { coinName, investmentAmount, date } = request.query;
-  
+
   res.status(204).end();
 });
 
@@ -83,4 +83,4 @@ var listener = app.listen(process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
 
-module.exports = app ;
+module.exports = app;
