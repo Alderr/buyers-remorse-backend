@@ -69,6 +69,10 @@ let getHistoryRatePromise = function (coinName, investmentAmount , date ) {
     });
   };
 
+let calculateProfit = function (beginningPrice, endPrice, investmentAmount){
+  return Math.trunc(endPrice/beginningPrice * investmentAmount);
+}
+
 app.get("/v2/profit", function (request, response) {
 
   let requiredQueryNames = ['coinName', 'investmentAmount', 'date'];
@@ -82,13 +86,15 @@ app.get("/v2/profit", function (request, response) {
   var { coinName, investmentAmount, date } = request.query;
 
 
-  Promise.all([getCurrentRatePromise(), getHistoryRatePromise()])
+  Promise.all([getHistoryRatePromise(), getCurrentRatePromise()])
     .then((values) => {
-      console.log('lol');
-      console.log(values);
+      let [ beforeWorth, afterWorth ] = values;
+      let grossProfit = calculateProfit(beforeWorth, afterWorth, investmentAmount);
+
+      response.json({profit: grossProfit, investment: 1000, percentageOfIncrease: Math.trunc(afterWorth/beforeWorth * 100) + "%"});
     });
 
-    response.status(204).end();
+
 });
 
 app.get('/coinNames', (req, res) => {
@@ -125,7 +131,31 @@ app.get('/coinNames', (req, res) => {
 });
 
 app.get('/symbols', (req, res) => {
-    let symbols = {};
+
+      var options = {
+        method: 'GET',
+        uri: 'https://rest.coinapi.io/v1/symbols',
+        headers: {
+            'User-Agent': 'Request-Promise',
+            'X-CoinAPI-Key': API_KEY
+        },
+        json: true // Automatically parses the JSON string in the response
+      };
+
+
+    rp(options)
+      .then(function (data) {
+          //console.log(data);
+           return res.json(data);
+      })
+      .catch(function (err) {
+          console.log(err);
+      });
+
+});
+
+app.get('/symbols/:coinName', (req, res) => {
+    let coinName = req.params.coinName;
 
       var options = {
         method: 'GET',
@@ -142,7 +172,7 @@ app.get('/symbols', (req, res) => {
       .then(function (data) {
           data.forEach( (symbol) => {
 
-            if(symbol.asset_id_base === 'BCH' && symbol.asset_id_quote === 'USD')
+            if(symbol.asset_id_base === coinName && symbol.asset_id_quote === 'USD')
             {
               console.log(symbol.symbol_id);
               Ids.push({ id: symbol.symbol_id, start: symbol.data_start, end: symbol.data_end });
@@ -151,10 +181,10 @@ app.get('/symbols', (req, res) => {
           });
 
           //console.log(data);
-           return res.json(Ids);
+           return Ids.length === 0 ? res.send('None found!') : res.json(Ids);
       })
       .catch(function (err) {
-          console.log(err);
+          return res.send(err.message);
       });
 
 });
