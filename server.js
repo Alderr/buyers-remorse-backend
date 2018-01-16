@@ -102,7 +102,7 @@ app.get("/v2/profit", function (request, response) {
         let grossProfit = calculateProfit(beforeWorth, afterWorth, investmentAmount);
         let percentIncrease = calculatePercentage(beforeWorth, afterWorth);
 
-        response.json({profit: grossProfit, investment: 1000, percentageOfIncrease: percentIncrease});
+        response.json({profit: grossProfit, investment: investmentAmount, percentageOfIncrease: percentIncrease});
       })
       .catch((err) => {
         response.send(err.message);
