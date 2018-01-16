@@ -42,10 +42,11 @@ let getCurrentRatePromise = function (coinName, investmentAmount , date ) {
 
   return rp(currentRateOptions)
     .then(function (data) {
-          return Math.trunc(data.rate);
+          return Promise.reslove(Math.trunc(data.rate));
     })
   .catch(function (err) {
-        console.log(err);
+        console.log(err.message);
+        return Promise.reject(new Error(err));
     });
 
 };
@@ -63,10 +64,11 @@ let getHistoryRatePromise = function (coinName, investmentAmount , date ) {
 
   return rp(historyRateOptions)
     .then(function (data) {
-          return Math.trunc(data[0].price);
+          return Promise.resolve(Math.trunc(data[0].price));
     })
   .catch(function (err) {
-        console.log(err);
+        console.log(err.message);
+        return Promise.reject(new Error(err));
     });
   };
 
@@ -81,26 +83,30 @@ let calculatePercentage = function (beginningPrice, endPrice){
 
 app.get("/v2/profit", function (request, response) {
 
-  let requiredQueryNames = ['coinName', 'investmentAmount', 'date'];
+    let requiredQueryNames = ['coinName', 'investmentAmount', 'date'];
 
     for (name in requiredQueryNames){
       //not in requiredQueryNames tell to get come back latah
-    if (!request.query[requiredQueryNames[name]]) {
-      return response.status(404).send('Missing query.');
+        if (!request.query[requiredQueryNames[name]]) {
+          return response.status(404).send('Missing query.');
+        }
     }
-  }
 
-  var { coinName, investmentAmount, date } = request.query;
+    var { coinName, investmentAmount, date } = request.query;
 
 
-  Promise.all([getHistoryRatePromise(), getCurrentRatePromise()])
-    .then((values) => {
-      let [ beforeWorth, afterWorth ] = values;
-      let grossProfit = calculateProfit(beforeWorth, afterWorth, investmentAmount);
-      let percentIncrease = calculatePercentage(beforeWorth, afterWorth);
+    Promise.all([getHistoryRatePromise(), getCurrentRatePromise()])
+      .then((values) => {
+        console.log(values);
+        let [ beforeWorth, afterWorth ] = values;
+        let grossProfit = calculateProfit(beforeWorth, afterWorth, investmentAmount);
+        let percentIncrease = calculatePercentage(beforeWorth, afterWorth);
 
-      response.json({profit: grossProfit, investment: 1000, percentageOfIncrease: percentIncrease});
-    });
+        response.json({profit: grossProfit, investment: 1000, percentageOfIncrease: percentIncrease});
+      })
+      .catch((err) => {
+        response.send(err.message);
+      });
 
 
 });
