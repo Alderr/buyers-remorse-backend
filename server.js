@@ -42,7 +42,7 @@ let getCurrentRatePromise = function (coinName, investmentAmount , date ) {
 
   return rp(currentRateOptions)
     .then(function (data) {
-          return Promise.reslove(Math.trunc(data.rate));
+          return Promise.resolve(Math.trunc(data.rate));
     })
   .catch(function (err) {
         console.log(err.message);
