@@ -27,6 +27,7 @@ app.get("/v1/profit", function (request, response) {
 
 });
 
+//functions for v2
 let getCurrentRatePromise = function (coinName, investmentAmount , date ) {
 
   var currentRateOptions = {
@@ -73,11 +74,17 @@ let calculateProfit = function (beginningPrice, endPrice, investmentAmount){
   return Math.trunc(endPrice/beginningPrice * investmentAmount);
 }
 
+let calculatePercentage = function (beginningPrice, endPrice){
+  return Math.trunc(endPrice/beginningPrice * 100) + '%';
+}
+
+
 app.get("/v2/profit", function (request, response) {
 
   let requiredQueryNames = ['coinName', 'investmentAmount', 'date'];
 
     for (name in requiredQueryNames){
+      //not in requiredQueryNames tell to get come back latah
     if (!request.query[requiredQueryNames[name]]) {
       return response.status(404).send('Missing query.');
     }
@@ -90,8 +97,9 @@ app.get("/v2/profit", function (request, response) {
     .then((values) => {
       let [ beforeWorth, afterWorth ] = values;
       let grossProfit = calculateProfit(beforeWorth, afterWorth, investmentAmount);
+      let percentIncrease = calculatePercentage(beforeWorth, afterWorth);
 
-      response.json({profit: grossProfit, investment: 1000, percentageOfIncrease: Math.trunc(afterWorth/beforeWorth * 100) + "%"});
+      response.json({profit: grossProfit, investment: 1000, percentageOfIncrease: percentIncrease});
     });
 
 
