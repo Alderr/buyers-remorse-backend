@@ -344,62 +344,63 @@ function deleteSpecificBCH(response, id) {
 
 }
 
-function deleteAllOfETH(response) {
+function deleteAllOfETH() {
 
     return ETH_Investments.find()
     .remove()
     .then((data) => {
 
-      response.status(201).end();
+      Promise.resolve(data);;
     })
     .catch((err) => {
-      response.status(404).send(err.message);
+      Promise.reject(data);
   });
 
 }
 
-function deleteAllOfBTC(response) {
+function deleteAllOfBTC() {
 
     return BTC_Investments.find()
     .remove()
     .then((data) => {
 
-      response.status(201).end();
+      Promise.resolve(data);;
     })
     .catch((err) => {
-      response.status(404).send(err.message);
+      Promise.reject(data);
   });
 
 }
 
-function deleteAllOfXRP(response) {
+function deleteAllOfXRP() {
 
     return XRP_Investments.find()
     .remove()
     .then((data) => {
 
-      response.status(201).end();
+      Promise.resolve(data);;
     })
     .catch((err) => {
-      response.status(404).send(err.message);
+      Promise.reject(data);
   });
 
 }
 
-function deleteAllOfBCH(response) {
+function deleteAllOfBCH() {
 
     return BCH_Investments.find()
     .remove()
     .then((data) => {
 
-      response.status(201).end();
+      Promise.resolve(data);;
     })
     .catch((err) => {
-      response.status(404).send(err.message);
+      Promise.reject(data);
   });
 
 }
 
+//update
 
 v3Router.get('/investments', (req, res) => {
 
@@ -508,7 +509,14 @@ v3Router.delete('/investments/:coinName/:id', (req, res) => {
 
 //delete all investments
 v3Router.delete('/investments', (req, res) => {
-  res.send('Home');
+  Promise.all([getAllBCH(response),getAllBTC(response), getAllXRP(response),getAllETH(response)])
+  .then((data) => {
+    res.status(201).end();
+  })
+  .catch((err) => {
+    console.log(err.message);
+    res.status(404).send(err.message);
+  });
 });
 
 module.exports = v3Router ;
