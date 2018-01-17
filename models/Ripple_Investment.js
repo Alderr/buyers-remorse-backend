@@ -18,6 +18,7 @@ XRP_Investments_Schema.methods.serialize = function() {
   return {
     id: this._id,
     previousValue: this.previousValue,
+    coinName: 'XRP',
     investmentAmount: this.investmentAmount,
     coinAmount: this.created_coinAmount,
     date: this.date

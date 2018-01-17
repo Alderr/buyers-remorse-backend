@@ -130,29 +130,79 @@ function addToBCH(response, investmentAmount, previousValue, date) {
 }
 
 function getAllETH(response) {
+  let ETH_data = [];
+
+    return ETH_Investments.find()
+    .then((data) => {
+
+      data.forEach((investment) => {
+        ETH_data.push(investment.serialize());
+      });
+
+      return Promise.resolve(ETH_data);
+
+    })
+    .catch((err) => {
+      return Promise.reject(err.message);
+  });
 
 }
 
-function getAllBTC() {
+function getAllBTC(response) {
+
+  let BTC_data = [];
+
+    return BTC_Investments.find()
+    .then((data) => {
+
+      data.forEach((investment) => {
+        BTC_data.push(investment.serialize());
+      });
+
+      return Promise.resolve(BTC_data);
+
+    })
+    .catch((err) => {
+      return Promise.reject(err.message);
+  });
 
 }
 
-function getAllXRP() {
+function getAllXRP(response) {
+  let XRP_data = [];
+
+  return XRP_Investments.find()
+  .then((data) => {
+
+    data.forEach((investment) => {
+      XRP_data.push(investment.serialize());
+    });
+
+    return Promise.resolve(XRP_data);
+
+  })
+  .catch((err) => {
+    return Promise.reject(err.message);
+  });
+
 
 }
 
-function getAllBCH() {
+function getAllBCH(response) {
   let BCH_data = [];
 
   return BCH_Investments.find()
   .then((data) => {
 
     data.forEach((investment) => {
-      ETH_data.push(investment.serialize());
+      BCH_data.push(investment.serialize());
     });
 
-    return Promise.resolve(ETH_data);
+    return Promise.resolve(BCH_data);
 
+  })
+  .catch((err) => {
+    Promise.reject(err.message);
   });
 
 }
@@ -160,22 +210,27 @@ function getAllBCH() {
 function getAllCoins(response) {
   let all_data = [];
 
-let ETH_data = [];
-ETH_Investments.find()
-.then((data) => {
+  Promise.all([getAllBCH(response),getAllBTC(response), getAllXRP(response),getAllETH(response)])
+  .then((data) => {
 
-  data.forEach((investment) => {
-    ETH_data.push(investment.serialize());
+    console.log('Here!');
+
+    for (x in data) {
+      all_data = all_data.concat(data[x]);
+    }
+
+    response.json(all_data);
+  })
+  .catch((err) => {
+    console.log(err.message);
+    response.status(404).send(err.message);
   });
-  console.log(ETH_data);
-  mongoose.disconnect();
-});
 
 }
 
 v3Router.get('/investments', (req, res) => {
-  let allData = [];
 
+  getAllCoins(res);
 
 });
 

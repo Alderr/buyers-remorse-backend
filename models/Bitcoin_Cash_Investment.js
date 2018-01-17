@@ -17,6 +17,7 @@ BCH_Investments_Schema.virtual('created_coinAmount').get(function() {
 BCH_Investments_Schema.methods.serialize = function() {
   return {
     id: this._id,
+    coinName: 'BCH',
     previousValue: this.previousValue,
     investmentAmount: this.investmentAmount,
     coinAmount: this.created_coinAmount,
