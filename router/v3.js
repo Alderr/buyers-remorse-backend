@@ -228,6 +228,63 @@ function getAllCoins(response) {
 
 }
 
+function getSpecificETH(response, id) {
+
+    return ETH_Investments.findById(id)
+    .then((data) => {
+
+      response.json(data.serialize());
+
+    })
+    .catch((err) => {
+      return Promise.reject(err.message);
+  });
+
+}
+
+function getSpecificBTC(response, id) {
+
+    return BTC_Investments.findById(id)
+    .then((data) => {
+
+      response.json(data.serialize());
+
+    })
+    .catch((err) => {
+      return Promise.reject(err.message);
+  });
+
+}
+
+function getSpecificXRP(response, id) {
+
+  return XRP_Investments.findById(id)
+  .then((data) => {
+
+    response.json(data.serialize());
+
+  })
+  .catch((err) => {
+    return Promise.reject(err.message);
+  });
+
+
+}
+
+function getSpecificBCH(response, id) {
+
+  return BCH_Investments.findById(id)
+  .then((data) => {
+
+    response.json(data.serialize());
+
+  })
+  .catch((err) => {
+    Promise.reject(err.message);
+  });
+
+}
+
 v3Router.get('/investments', (req, res) => {
 
   getAllCoins(res);
@@ -240,8 +297,33 @@ v3Router.get('/investments/:coinName', (req, res) => {
 });
 
 //get a investment for a coinName lol.com/BTC/1204
-v3Router.get('/investments/:coinName/:id', (req, res) => {
-  res.send('Home');
+v3Router.get('/investment/:coinName/:id', (req, res) => {
+
+  let requiredQueryNames = ['coinName', 'id'];
+
+  for (name in requiredQueryNames){
+    if (!req.params[requiredQueryNames[name]]) {
+      return res.status(404).send('Missing query.');
+    }
+  }
+
+  let { coinName, id } = req.params;
+
+  switch(coinName) {
+    case 'XRP':
+      getSpecificXRP(res, id);
+      break;
+    case 'ETH':
+      getSpecificETH(res, id);
+      break;
+    case 'BCH':
+      getSpecificBCH(res, id);
+      break;
+    case 'BTC':
+      getSpecificBTC(res, id);
+      break;
+  }
+
 });
 
 //create a investment; needs a query
