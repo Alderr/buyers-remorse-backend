@@ -1,6 +1,6 @@
 require('dotenv').config();
 const rp = require('request-promise');
-
+const cors = require('cors');
 // init project
 var express = require('express');
 var app = express();
@@ -8,6 +8,7 @@ var app = express();
 const API_KEY = process.env.API_KEY;
 const v3Router = require('./router/v3');
 
+app.use(cors());
 app.use('/v3', v3Router);
 
 app.get("/", function (request, response) {
