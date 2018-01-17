@@ -36,7 +36,7 @@ function isTherePreviousValue(value , object) {
 function addToETH(response, investmentAmount, previousValue, date) {
 
   let a_ETH_Investment = {
-    investmentAmount: 100
+    investmentAmount: investmentAmount
   };
 
   isThereDate(date, a_ETH_Investment);
@@ -129,9 +129,54 @@ function addToBCH(response, investmentAmount, previousValue, date) {
   //return response.json(a_BCH_Investment);
 }
 
+function getAllETH() {
+
+}
+
+function getAllBTC() {
+
+}
+
+function getAllXRP() {
+
+}
+
+function getAllBCH() {
+  let BCH_data = [];
+
+  return BCH_Investments.find()
+  .then((data) => {
+
+    data.forEach((investment) => {
+      ETH_data.push(investment.serialize());
+    });
+
+    return Promise.resolve(ETH_data);
+
+  });
+
+}
+
+function getAllCoins(response) {
+  let all_data = [];
+
+let ETH_data = [];
+ETH_Investments.find()
+.then((data) => {
+
+  data.forEach((investment) => {
+    ETH_data.push(investment.serialize());
+  });
+  console.log(ETH_data);
+  mongoose.disconnect();
+});
+
+}
 
 v3Router.get('/investments', (req, res) => {
-  res.send('Home');
+  let allData = [];
+
+
 });
 
 //get all investments for a specific coin
@@ -145,7 +190,6 @@ v3Router.get('/investments/:coinName/:id', (req, res) => {
 });
 
 //create a investment; needs a query
-//{}
 v3Router.post('/investment', (req, res) => {
     let requiredQueryNames = ['coinName', 'investmentAmount'];
 
@@ -189,4 +233,5 @@ v3Router.delete('/investments/:coinName/:id', (req, res) => {
 v3Router.delete('/investments', (req, res) => {
   res.send('Home');
 });
+
 module.exports = v3Router ;
