@@ -42,9 +42,16 @@ app.post("/v1/profit", function (request, response) {
     }
   }
 
-  var { coinName, investmentAmount, date } = request.body;
+  let { coinName, investmentAmount, date } = request.body;
 
-  return response.json({ coinName, investmentAmount, date});
+
+  if (date === '') {
+
+  }
+
+  console.log(date);
+  return res.send(Date.now());
+  //return response.json({ coinName, investmentAmount, date});
 
 });
 
@@ -103,12 +110,12 @@ let calculatePercentage = function (beginningPrice, endPrice){
 
 app.get("/v2/profit", function (request, response) {
 
-    let requiredQueryNames = ['coinName', 'investmentAmount', 'date'];
+    let requiredQueryNames = ['coinName', 'investmentAmount'];
 
     for (name in requiredQueryNames){
       //not in requiredQueryNames tell to get come back latah
         if (!request.query[requiredQueryNames[name]]) {
-          return response.status(404).send('Missing query.');
+          return response.status(404).send('Missing required query.');
         }
     }
 
