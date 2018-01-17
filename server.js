@@ -6,6 +6,9 @@ var express = require('express');
 var app = express();
 
 const API_KEY = process.env.API_KEY;
+const v3Router = require('./router/v3');
+
+app.use('/v3', v3Router);
 
 app.get("/", function (request, response) {
   response.send('Home');
@@ -79,7 +82,6 @@ let calculateProfit = function (beginningPrice, endPrice, investmentAmount){
 let calculatePercentage = function (beginningPrice, endPrice){
   return Math.trunc(endPrice/beginningPrice * 100) + '%';
 }
-
 
 app.get("/v2/profit", function (request, response) {
 
