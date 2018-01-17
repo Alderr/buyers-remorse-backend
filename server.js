@@ -2,8 +2,12 @@ require('dotenv').config();
 
 const rp = require('request-promise');
 const cors = require('cors');
+
 const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
+
 var express = require('express');
+
 
 var app = express();
 
