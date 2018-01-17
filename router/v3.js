@@ -33,6 +33,7 @@ function isTherePreviousValue(value , object) {
   }
 }
 
+// for post
 function addToETH(response, investmentAmount, previousValue, date) {
 
   let a_ETH_Investment = {
@@ -129,6 +130,7 @@ function addToBCH(response, investmentAmount, previousValue, date) {
   //return response.json(a_BCH_Investment);
 }
 
+//for GETs
 function getAllETH(response) {
   let ETH_data = [];
 
@@ -285,6 +287,120 @@ function getSpecificBCH(response, id) {
 
 }
 
+//for del
+function deleteSpecificETH(response, id) {
+
+    return ETH_Investments.findById(id)
+    .remove()
+    .then((data) => {
+
+      response.status(201).end();
+    })
+    .catch((err) => {
+      response.status(404).send(err.message);
+  });
+
+}
+
+function deleteSpecificBTC(response, id) {
+
+    return BTC_Investments.findById(id)
+    .remove()
+    .then((data) => {
+
+      response.status(201).end();
+    })
+    .catch((err) => {
+      response.status(404).send(err.message);
+  });
+
+}
+
+function deleteSpecificXRP(response, id) {
+
+    return XRP_Investments.findById(id)
+    .remove()
+    .then((data) => {
+
+      response.status(201).end();
+    })
+    .catch((err) => {
+      response.status(404).send(err.message);
+  });
+
+}
+
+function deleteSpecificBCH(response, id) {
+
+    return BCH_Investments.findById(id)
+    .remove()
+    .then((data) => {
+
+      response.status(201).end();
+    })
+    .catch((err) => {
+      response.status(404).send(err.message);
+  });
+
+}
+
+function deleteAllOfETH(response) {
+
+    return ETH_Investments.find()
+    .remove()
+    .then((data) => {
+
+      response.status(201).end();
+    })
+    .catch((err) => {
+      response.status(404).send(err.message);
+  });
+
+}
+
+function deleteAllOfBTC(response) {
+
+    return BTC_Investments.find()
+    .remove()
+    .then((data) => {
+
+      response.status(201).end();
+    })
+    .catch((err) => {
+      response.status(404).send(err.message);
+  });
+
+}
+
+function deleteAllOfXRP(response) {
+
+    return XRP_Investments.find()
+    .remove()
+    .then((data) => {
+
+      response.status(201).end();
+    })
+    .catch((err) => {
+      response.status(404).send(err.message);
+  });
+
+}
+
+function deleteAllOfBCH(response) {
+
+    return BCH_Investments.find()
+    .remove()
+    .then((data) => {
+
+      response.status(201).end();
+    })
+    .catch((err) => {
+      response.status(404).send(err.message);
+  });
+
+}
+
+
 v3Router.get('/investments', (req, res) => {
 
   getAllCoins(res);
@@ -363,7 +479,31 @@ v3Router.put('/investments/:coinName/:id', (req, res) => {
 
 //del a investment
 v3Router.delete('/investments/:coinName/:id', (req, res) => {
-  res.send('Home');
+  let requiredQueryNames = ['coinName', 'id'];
+
+  for (name in requiredQueryNames){
+    if (!req.params[requiredQueryNames[name]]) {
+      return res.status(404).send('Missing query.');
+    }
+  }
+
+  let { coinName, id } = req.params;
+
+  switch(coinName) {
+    case 'XRP':
+      deleteSpecificXRP(res, id);
+      break;
+    case 'ETH':
+      deleteSpecificETH(res, id);
+      break;
+    case 'BCH':
+      deleteSpecificBCH(res, id);
+      break;
+    case 'BTC':
+      deleteSpecificBTC(res, id);
+      break;
+  }
+
 });
 
 //delete all investments
