@@ -19,8 +19,8 @@ ETH_Investments_Schema.methods.serialize = function() {
     id: this._id,
     previousValue: this.previousValue,
     investmentAmount: this.investmentAmount,
-    date: this.date,
-    coinAmount: this.created_coinAmount
+    coinAmount: this.created_coinAmount,
+    date: this.date
   };
 };
 
