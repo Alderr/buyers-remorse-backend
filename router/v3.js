@@ -475,7 +475,7 @@ v3Router.post('/investment', (req, res) => {
 
 //update a investment
 v3Router.put('/investments/:coinName/:id', (req, res) => {
-  res.send('Home');
+  
 });
 
 //del a investment
@@ -509,8 +509,9 @@ v3Router.delete('/investments/:coinName/:id', (req, res) => {
 
 //delete all investments
 v3Router.delete('/investments', (req, res) => {
-  Promise.all([getAllBCH(response),getAllBTC(response), getAllXRP(response),getAllETH(response)])
+  Promise.all([deleteAllOfBCH(response),deleteAllOfBTC(response), deleteAllOfXRP(response),deleteAllOfETH(response)])
   .then((data) => {
+    console.log(data);
     res.status(201).end();
   })
   .catch((err) => {
@@ -519,4 +520,5 @@ v3Router.delete('/investments', (req, res) => {
   });
 });
 
-module.exports = v3Router ;
+
+module.exports = v3Router;
