@@ -60,7 +60,7 @@ function addToETH(response, investmentAmount, previousValue, date) {
 function addToBTC(response, investmentAmount, previousValue, date) {
 
   let a_BTC_Investment = {
-    investmentAmount: 100
+    investmentAmount: investmentAmount
   };
 
   isThereDate(date, a_BTC_Investment);
@@ -84,7 +84,7 @@ function addToBTC(response, investmentAmount, previousValue, date) {
 function addToXRP(response, investmentAmount, previousValue, date) {
 
   let a_XRP_Investment = {
-    investmentAmount: 100
+    investmentAmount: investmentAmount
   };
 
   isThereDate(date, a_XRP_Investment);
@@ -108,7 +108,7 @@ function addToXRP(response, investmentAmount, previousValue, date) {
 function addToBCH(response, investmentAmount, previousValue, date) {
 
   let a_BCH_Investment = {
-    investmentAmount: 100
+    investmentAmount: investmentAmount
   };
 
   isThereDate(date, a_BCH_Investment);
@@ -129,7 +129,7 @@ function addToBCH(response, investmentAmount, previousValue, date) {
   //return response.json(a_BCH_Investment);
 }
 
-function getAllETH() {
+function getAllETH(response) {
 
 }
 
