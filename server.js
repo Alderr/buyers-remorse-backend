@@ -99,12 +99,12 @@ app.get("/v2/profit", function (request, response) {
 
     for (name in requiredQueryNames){
       //not in requiredQueryNames tell to get come back latah
-        if (!request.query[requiredQueryNames[name]]) {
+        if (!request.body[requiredQueryNames[name]]) {
           return response.status(404).send('Missing query.');
         }
     }
 
-    var { coinName, investmentAmount, date } = request.query;
+    var { coinName, investmentAmount, date } = request.body;
 
 
     Promise.all([getHistoryRatePromise(), getCurrentRatePromise()])

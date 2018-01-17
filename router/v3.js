@@ -1,6 +1,10 @@
 const express = require('express');
 
 
+const { BCH_Investments } = require('../models/Bitcoin_Cash_Investment');
+const { ETH_Investments } = require('../models/Ethereum_Investment');
+const { XRP_Investments } = require('../models/Ripple_Investment');
+const { BTC_Investments } = require('../models/Bitcoin_Investment');
 
 let v3Router = express.Router();
 ///v3/investments
@@ -21,7 +25,18 @@ v3Router.get('/investments/:coinName/:id', (req, res) => {
 //create a investment; needs a query
 //{}
   v3Router.post('/investment', (req, res) => {
-    res.send('Home');
+    let requiredQueryNames = ['coinName', 'investmentAmount', 'date'];
+
+    for (name in requiredQueryNames){
+      //not in requiredQueryNames tell to get come back latah
+        if (!request.query[requiredQueryNames[name]]) {
+          return response.status(404).send('Missing query.');
+        }
+    }
+
+    var { coinName, investmentAmount, date } = request.query;
+
+    res.json('Home');
   });
 
 //update a investment

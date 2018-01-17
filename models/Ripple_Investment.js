@@ -14,7 +14,7 @@ XRP_Investments_Schema.virtual('created_coinAmount').get(function() {
   return this.investmentAmount/this.previousValue;
 });
 
-XRP_Investments_Schema.mXRPods.serialize = function() {
+XRP_Investments_Schema.methods.serialize = function() {
   return {
     id: this._id,
     previousValue: this.previousValue,
