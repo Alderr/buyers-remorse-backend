@@ -2,8 +2,10 @@ require('dotenv').config();
 
 const rp = require('request-promise');
 const cors = require('cors');
-
+const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
+const morgan = require('morgan')
+
 mongoose.Promise = global.Promise;
 
 var express = require('express');
@@ -18,23 +20,29 @@ const PORT = process.env.PORT;
 const v3Router = require('./router/v3');
 
 app.use(cors());
+app.use(morgan('dev'));
+app.use(morgan('combined'));
+// parse application/x-www-form-urlencoded &  application/json
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+
 app.use('/v3', v3Router);
 
 app.get("/", function (request, response) {
   response.send('Home');
 });
 
-app.get("/v1/profit", function (request, response) {
+app.post("/v1/profit", function (request, response) {
 
     let requiredQueryNames = ['coinName', 'investmentAmount', 'date'];
 
     for (name in requiredQueryNames){
-    if (!request.query[requiredQueryNames[name]]) {
+    if (!request.body[requiredQueryNames[name]]) {
       return response.status(404).send('Missing query.');
     }
   }
 
-  var { coinName, investmentAmount, date } = request.query;
+  var { coinName, investmentAmount, date } = request.body;
 
   return response.json({ coinName, investmentAmount, date});
 
@@ -99,12 +107,12 @@ app.get("/v2/profit", function (request, response) {
 
     for (name in requiredQueryNames){
       //not in requiredQueryNames tell to get come back latah
-        if (!request.body[requiredQueryNames[name]]) {
+        if (!request.query[requiredQueryNames[name]]) {
           return response.status(404).send('Missing query.');
         }
     }
 
-    var { coinName, investmentAmount, date } = request.body;
+    var { coinName, investmentAmount, date } = request.query;
 
 
     Promise.all([getHistoryRatePromise(), getCurrentRatePromise()])
