@@ -1,4 +1,4 @@
-const express = require('express');
+  const express = require('express');
 
 
 const { BCH_Investments } = require('../models/Bitcoin_Cash_Investment');
@@ -691,7 +691,7 @@ v3Router.delete('/investments/:coinName/:id', (req, res) => {
 
 });
 
-//delete all investments KOREA NUKE
+//delete all investments NUKE
 v3Router.delete('/investments', (req, res) => {
 
     Promise.all([deleteAllOfBCH(res),deleteAllOfBTC(res), deleteAllOfXRP(res),deleteAllOfETH(res)])
