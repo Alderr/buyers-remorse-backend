@@ -506,14 +506,14 @@ function updateSpecificBCH(response, id, investmentAmount, previousValue, date) 
 
 }
 
-
+//gets all investments
 v3Router.get('/investments', (req, res) => {
 
     getAllCoins(res);
 
 });
 
-//get all investments for a specific coin; not built yet
+//get all investments for a specific coin - PARAMS: [coinName]
 v3Router.get('/investments/:coinName', (req, res) => {
 
     let requiredParamsNames = ['coinName'];
@@ -551,13 +551,14 @@ v3Router.get('/investments/:coinName', (req, res) => {
                 res.json(data);
             });
         break;
+    default:
+        res.send('No such coin.');
     }
 
 });
 
-
-//get a investment for a coinName lol.com/BTC/1204
-v3Router.get('/investment/:coinName/:id', (req, res) => {
+//get a investment for a coin - PARAMS: [coinName] / [id]
+v3Router.get('/investments/:coinName/:id', (req, res) => {
 
     let requiredParamsNames = ['coinName', 'id'];
 
@@ -582,12 +583,14 @@ v3Router.get('/investment/:coinName/:id', (req, res) => {
     case 'BTC':
         getSpecificBTC(res, id);
         break;
+    default:
+        res.send('No such coin.');
     }
 
 });
 
-//create a investment; needs a query
-v3Router.post('/investment', (req, res) => {
+//create a investment - BODY: [coinName] [investmentAmount], [previousValue=canBeEmpty], [date=canBeEmpty]
+v3Router.post('/investments', (req, res) => {
     let requiredQueryNames = ['coinName', 'investmentAmount'];
 
     for (name in requiredQueryNames){
@@ -612,12 +615,14 @@ v3Router.post('/investment', (req, res) => {
     case 'BTC':
         addToBTC(res, investmentAmount, previousValue, date);
         break;
+    default:
+        res.send('No such coin.');
     }
 
 });
 
-//update a investment
-v3Router.put('/investment/:coinName/:id', (req, res) => {
+//update a investment - BODY: [coinName] [investmentAmount], [previousValue], [date]
+v3Router.put('/investments/:coinName/:id', (req, res) => {
     let requiredParamsNames = ['coinName', 'id'];
     let requiredBodyNames = ['investmentAmount', 'previousValue', 'date'];
 
@@ -655,8 +660,8 @@ v3Router.put('/investment/:coinName/:id', (req, res) => {
 
 });
 
-//del a investment
-v3Router.delete('/investment/:coinName/:id', (req, res) => {
+//del a investment - PARAMS: [coinName] / [id]
+v3Router.delete('/investments/:coinName/:id', (req, res) => {
     let requiredParamsNames = ['coinName', 'id'];
 
     for (name in requiredParamsNames){
@@ -680,11 +685,13 @@ v3Router.delete('/investment/:coinName/:id', (req, res) => {
     case 'BTC':
         deleteSpecificBTC(res, id);
         break;
+    default:
+        res.send('No such coin.');
     }
 
 });
 
-//delete all investments
+//delete all investments KOREA NUKE
 v3Router.delete('/investments', (req, res) => {
 
     Promise.all([deleteAllOfBCH(res),deleteAllOfBTC(res), deleteAllOfXRP(res),deleteAllOfETH(res)])
