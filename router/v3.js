@@ -52,7 +52,7 @@ function addToETH(response, investmentAmount, previousValue, date) {
         })
         .catch((err) => {
             console.log(err);
-            res.status(404).send(err.message);
+            response.status(404).send(err.message);
         });
 
     //return response.json(a_ETH_Investment);
@@ -76,7 +76,7 @@ function addToBTC(response, investmentAmount, previousValue, date) {
         })
         .catch((err) => {
             console.log(err);
-            res.status(404).send(err.message);
+            response.status(404).send(err.message);
         });
 
     //return response.json(a_BTC_Investment);
@@ -100,7 +100,7 @@ function addToXRP(response, investmentAmount, previousValue, date) {
         })
         .catch((err) => {
             console.log(err);
-            res.status(404).send(err.message);
+            response.status(404).send(err.message);
         });
 
     //return response.json(a_XRP_Investment);
@@ -124,13 +124,13 @@ function addToBCH(response, investmentAmount, previousValue, date) {
         })
         .catch((err) => {
             console.log(err);
-            res.status(404).send(err.message);
+            response.status(404).send(err.message);
         });
 
     //return response.json(a_BCH_Investment);
 }
 
-//for GETs
+//for GET ALL, GET/:coinName
 function getAllETH() {
     let ETH_data = [];
 
@@ -230,7 +230,7 @@ function getAllCoins(response) {
 
 }
 
-//GET:coinName:ID; they all send a response
+//GET/:coinName/:ID;  they all send a response
 function getSpecificETH(response, id) {
 
     return ETH_Investments.findById(id)
@@ -240,7 +240,7 @@ function getSpecificETH(response, id) {
 
         })
         .catch((err) => {
-            return Promise.reject(err.message);
+            response.status(404).send(err.message);
         });
 
 }
@@ -254,7 +254,7 @@ function getSpecificBTC(response, id) {
 
         })
         .catch((err) => {
-            return Promise.reject(err.message);
+            response.status(404).send(err.message);
         });
 
 }
@@ -268,7 +268,7 @@ function getSpecificXRP(response, id) {
 
         })
         .catch((err) => {
-            return Promise.reject(err.message);
+            response.status(404).send(err.message);
         });
 
 
@@ -283,7 +283,7 @@ function getSpecificBCH(response, id) {
 
         })
         .catch((err) => {
-            Promise.reject(err.message);
+            response.status(404).send(err.message);
         });
 
 }
@@ -350,11 +350,10 @@ function deleteAllOfETH() {
     return ETH_Investments.find()
         .remove()
         .then((data) => {
-
-            Promise.resolve(data);
+            return Promise.resolve(data);
         })
         .catch((err) => {
-            Promise.reject(err);
+            return Promise.reject(err);
         });
 
 }
@@ -364,11 +363,10 @@ function deleteAllOfBTC() {
     return BTC_Investments.find()
         .remove()
         .then((data) => {
-
-            Promise.resolve(data);
+            return Promise.resolve(data);
         })
         .catch((err) => {
-            Promise.reject(err);
+            return Promise.reject(err);
         });
 
 }
@@ -378,11 +376,10 @@ function deleteAllOfXRP() {
     return XRP_Investments.find()
         .remove()
         .then((data) => {
-
-            Promise.resolve(data);
+            return Promise.resolve(data);
         })
         .catch((err) => {
-            Promise.reject(err);
+            return Promise.reject(err);
         });
 
 }
@@ -392,11 +389,10 @@ function deleteAllOfBCH() {
     return BCH_Investments.find()
         .remove()
         .then((data) => {
-
-            Promise.resolve(data);
+            return Promise.resolve(data);
         })
         .catch((err) => {
-            Promise.reject(err);
+            return Promise.reject(err);
         });
 
 }
@@ -519,8 +515,46 @@ v3Router.get('/investments', (req, res) => {
 
 //get all investments for a specific coin; not built yet
 v3Router.get('/investments/:coinName', (req, res) => {
-    res.send('Home');
+
+    let requiredParamsNames = ['coinName'];
+
+    for (name in requiredParamsNames){
+        if (!req.params[requiredParamsNames[name]]) {
+            return res.status(404).send('Missing query.');
+        }
+    }
+
+    let { coinName } = req.params;
+
+    switch(coinName) {
+    case 'XRP':
+        getAllXRP()
+            .then((data) => {
+                res.json(data);
+            });
+        break;
+    case 'ETH':
+        getAllETH(res)
+            .then((data) => {
+                res.json(data);
+            });
+        break;
+    case 'BCH':
+        getAllBCH(res)
+            .then((data) => {
+                res.json(data);
+            });
+        break;
+    case 'BTC':
+        getAllBTC(res)
+            .then((data) => {
+                res.json(data);
+            });
+        break;
+    }
+
 });
+
 
 //get a investment for a coinName lol.com/BTC/1204
 v3Router.get('/investment/:coinName/:id', (req, res) => {
@@ -587,14 +621,14 @@ v3Router.put('/investment/:coinName/:id', (req, res) => {
     let requiredParamsNames = ['coinName', 'id'];
     let requiredBodyNames = ['investmentAmount', 'previousValue', 'date'];
 
-    for (name in requiredBodyNames){
-        if (!req.body[requiredBodyNames[name]]) {
+    for (let name in requiredParamsNames){
+        if (!req.params[requiredParamsNames[name]]) {
             return res.status(404).send('Missing query.');
         }
     }
 
-    for (name in requiredParamsNames){
-        if (!req.params[requiredParamsNames[name]]) {
+    for (let name in requiredBodyNames){
+        if (!req.body[requiredBodyNames[name]]) {
             return res.status(404).send('Missing query.');
         }
     }
@@ -623,10 +657,10 @@ v3Router.put('/investment/:coinName/:id', (req, res) => {
 
 //del a investment
 v3Router.delete('/investment/:coinName/:id', (req, res) => {
-    let requiredQueryNames = ['coinName', 'id'];
+    let requiredParamsNames = ['coinName', 'id'];
 
-    for (name in requiredQueryNames){
-        if (!req.params[requiredQueryNames[name]]) {
+    for (name in requiredParamsNames){
+        if (!req.params[requiredParamsNames[name]]) {
             return res.status(404).send('Missing query.');
         }
     }
@@ -652,10 +686,11 @@ v3Router.delete('/investment/:coinName/:id', (req, res) => {
 
 //delete all investments
 v3Router.delete('/investments', (req, res) => {
-    Promise.all([deleteAllOfBCH(response),deleteAllOfBTC(response), deleteAllOfXRP(response),deleteAllOfETH(response)])
+
+    Promise.all([deleteAllOfBCH(res),deleteAllOfBTC(res), deleteAllOfXRP(res),deleteAllOfETH(res)])
         .then((data) => {
             console.log(data);
-            res.status(201).end();
+            res.status(204).end();
         })
         .catch((err) => {
             console.log(err.message);
