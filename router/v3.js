@@ -518,7 +518,7 @@ v3Router.get('/investments/:coinName', (req, res) => {
 
     let requiredParamsNames = ['coinName'];
 
-    for (name in requiredParamsNames){
+    for (let name in requiredParamsNames){
         if (!req.params[requiredParamsNames[name]]) {
             return res.status(404).send('Missing query.');
         }
@@ -562,7 +562,7 @@ v3Router.get('/investments/:coinName/:id', (req, res) => {
 
     let requiredParamsNames = ['coinName', 'id'];
 
-    for (name in requiredParamsNames){
+    for (let name in requiredParamsNames){
         if (!req.params[requiredParamsNames[name]]) {
             return res.status(404).send('Missing query.');
         }
@@ -593,7 +593,7 @@ v3Router.get('/investments/:coinName/:id', (req, res) => {
 v3Router.post('/investments', (req, res) => {
     let requiredQueryNames = ['coinName', 'investmentAmount'];
 
-    for (name in requiredQueryNames){
+    for (let name in requiredQueryNames){
         if (!req.body[requiredQueryNames[name]]) {
             return res.status(404).send('Missing query.');
         }
@@ -664,7 +664,7 @@ v3Router.put('/investments/:coinName/:id', (req, res) => {
 v3Router.delete('/investments/:coinName/:id', (req, res) => {
     let requiredParamsNames = ['coinName', 'id'];
 
-    for (name in requiredParamsNames){
+    for (let name in requiredParamsNames){
         if (!req.params[requiredParamsNames[name]]) {
             return res.status(404).send('Missing query.');
         }
