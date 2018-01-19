@@ -2,9 +2,9 @@ require('dotenv').config();
 
 const rp = require('request-promise');
 const cors = require('cors');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const morgan = require('morgan')
+const morgan = require('morgan');
 
 mongoose.Promise = global.Promise;
 
@@ -23,157 +23,160 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(morgan('combined'));
 // parse application/x-www-form-urlencoded &  application/json
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.use('/v3', v3Router);
 
-app.get("/", function (request, response) {
-  response.send('Home');
+app.get('/', function (request, response) {
+    response.send('Home');
 });
 
-app.post("/v1/profit", function (request, response) {
+app.post('/v1/profit', function (request, response) {
 
     let requiredQueryNames = ['coinName', 'investmentAmount', 'date'];
 
     for (name in requiredQueryNames){
-    if (!request.body[requiredQueryNames[name]]) {
-      return response.status(404).send('Missing query.');
+        if (!request.body[requiredQueryNames[name]]) {
+            return response.status(404).send('Missing query.');
+        }
     }
-  }
 
-  let { coinName, investmentAmount, date } = request.body;
+    let { coinName, investmentAmount, date } = request.body;
 
 
-  if (date === '') {
+    if (date === '') {
 
-  }
+    }
 
-  console.log(date);
-  return res.send(Date.now());
-  //return response.json({ coinName, investmentAmount, date});
+    console.log(date);
+    return res.send(Date.now());
+    //return response.json({ coinName, investmentAmount, date});
 
 });
 
 //functions for v2
 let getCurrentRatePromise = function (coinName, investmentAmount , date ) {
+    console.log(coinName);
+    var currentRateOptions = {
+        method: 'GET',
+        uri: `https://rest.coinapi.io/v1/exchangerate/${coinName}/USD`,
+        headers: {
+            'User-Agent': 'Request-Promise',
+            'X-CoinAPI-Key': API_KEY
+        },
+        json: true // Automatically parses the JSON string in the response
+    };
 
-  var currentRateOptions = {
-    method: 'GET',
-    uri: 'https://rest.coinapi.io/v1/exchangerate/BTC/USD',
-    headers: {
-        'User-Agent': 'Request-Promise',
-        'X-CoinAPI-Key': API_KEY
-    },
-    json: true // Automatically parses the JSON string in the response
-  };
-
-  return rp(currentRateOptions)
-    .then(function (data) {
-          return Promise.resolve(Math.trunc(data.rate));
-    })
-  .catch(function (err) {
-        console.log(err.message);
-        return Promise.reject(new Error(err));
-    });
+    return rp(currentRateOptions)
+        .then(function (data) {
+            return Promise.resolve(data.rate);
+        })
+        .catch(function (err) {
+            console.log(err.message);
+            return Promise.reject(new Error(err));
+        });
 
 };
 
 let getHistoryRatePromise = function (coinName, investmentAmount , date ) {
     var historyRateOptions = {
-    method: 'GET',
-    uri: 'https://rest.coinapi.io/v1/trades/BITSTAMP_SPOT_BTC_USD/history?time_start=2016-01-01T00:00:00&limit=1',
-    headers: {
-        'User-Agent': 'Request-Promise',
-        'X-CoinAPI-Key': API_KEY
-    },
-    json: true // Automatically parses the JSON string in the response
-  };
+        method: 'GET',
+        uri: 'https://rest.coinapi.io/v1/trades/BITSTAMP_SPOT_BTC_USD/history?time_start=2016-01-01T00:00:00&limit=1',
+        headers: {
+            'User-Agent': 'Request-Promise',
+            'X-CoinAPI-Key': API_KEY
+        },
+        json: true // Automatically parses the JSON string in the response
+    };
 
-  return rp(historyRateOptions)
-    .then(function (data) {
-          return Promise.resolve(Math.trunc(data[0].price));
-    })
-  .catch(function (err) {
-        console.log(err.message);
-        return Promise.reject(new Error(err));
-    });
-  };
+    return rp(historyRateOptions)
+        .then(function (data) {
+            return Promise.resolve(Math.trunc(data[0].price));
+        })
+        .catch(function (err) {
+            console.log(err.message);
+            return Promise.reject(new Error(err));
+        });
+};
 
 let calculateProfit = function (beginningPrice, endPrice, investmentAmount){
-  return Math.trunc(endPrice/beginningPrice * investmentAmount);
-}
+    return Math.trunc(endPrice/beginningPrice * investmentAmount);
+};
 
 let calculatePercentage = function (beginningPrice, endPrice){
-  return Math.trunc(endPrice/beginningPrice * 100) + '%';
-}
+    return Math.trunc(endPrice/beginningPrice * 100) + '%';
+};
 
-app.get("/v2/profit", function (request, response) {
+app.get('/v2/profit', function (request, response) {
 
     let requiredQueryNames = ['coinName', 'investmentAmount'];
 
     for (name in requiredQueryNames){
-      //not in requiredQueryNames tell to get come back latah
+        //not in requiredQueryNames tell to get come back latah
         if (!request.query[requiredQueryNames[name]]) {
-          return response.status(404).send('Missing required query.');
+            return response.status(404).send('Missing required query.');
         }
     }
 
     var { coinName, investmentAmount, date } = request.query;
 
 
-    Promise.all([getHistoryRatePromise(), getCurrentRatePromise()])
-      .then((values) => {
-        console.log(values);
-        let [ beforeWorth, afterWorth ] = values;
-        let grossProfit = calculateProfit(beforeWorth, afterWorth, investmentAmount);
-        let percentIncrease = calculatePercentage(beforeWorth, afterWorth);
+    Promise.all([getHistoryRatePromise(coinName), getCurrentRatePromise(coinName)])
+        .then((values) => {
+            console.log(values);
+            let [ beforeWorth, afterWorth ] = values;
+            let grossProfit = calculateProfit(beforeWorth, afterWorth, investmentAmount);
+            let percentIncrease = calculatePercentage(beforeWorth, afterWorth);
 
-        response.json({profit: grossProfit, investment: investmentAmount, percentageOfIncrease: percentIncrease});
-      })
-      .catch((err) => {
-        response.send(err.message);
-      });
+            response.json({profit: grossProfit, investment: investmentAmount, percentageOfIncrease: percentIncrease, afterWorth: afterWorth});
+        })
+        .catch((err) => {
+            response.send(err.message);
+        });
 
 
 });
 
+app.get('/fuck!', (req, res) => {
+
+});
 app.get('/coinNames', (req, res) => {
-  let coinNames = {};
+    let coinNames = {};
 
     var options = {
-      method: 'GET',
-      uri: 'https://rest.coinapi.io/v1/assets',
-      headers: {
-          'User-Agent': 'Request-Promise',
-          'X-CoinAPI-Key': API_KEY
-      },
-      json: true // Automatically parses the JSON string in the response
+        method: 'GET',
+        uri: 'https://rest.coinapi.io/v1/assets',
+        headers: {
+            'User-Agent': 'Request-Promise',
+            'X-CoinAPI-Key': API_KEY
+        },
+        json: true // Automatically parses the JSON string in the response
     };
 
-  rp(options)
-    .then(function (data) {
-        data.forEach( (coin) => {
+    rp(options)
+        .then(function (data) {
+            data.forEach( (coin) => {
 
-            coinNames[coin.name] = {
-              start: coin.data_start,
-              end: coin.data_end
-            }
+                coinNames[coin.name] = {
+                    start: coin.data_start,
+                    end: coin.data_end
+                };
             //console.log(`${coin.name} ${coin.type_is_crypto==1 ? 'is cryptocurrency.' : 'is not a coin.'}`);
+            });
+        })
+        .then( () => {
+            res.json(coinNames);
+        })
+        .catch(function (err) {
+            console.log(err);
         });
-    })
-    .then( () => {
-      res.json(coinNames);
-  })
-    .catch(function (err) {
-        console.log(err);
-    });
 
 });
 
 app.get('/symbols', (req, res) => {
 
-      var options = {
+    var options = {
         method: 'GET',
         uri: 'https://rest.coinapi.io/v1/symbols',
         headers: {
@@ -181,24 +184,24 @@ app.get('/symbols', (req, res) => {
             'X-CoinAPI-Key': API_KEY
         },
         json: true // Automatically parses the JSON string in the response
-      };
+    };
 
 
     rp(options)
-      .then(function (data) {
-          //console.log(data);
-           return res.json(data);
-      })
-      .catch(function (err) {
-          console.log(err);
-      });
+        .then(function (data) {
+            //console.log(data);
+            return res.json(data);
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
 
 });
 
 app.get('/symbols/:coinName', (req, res) => {
     let coinName = req.params.coinName;
 
-      var options = {
+    var options = {
         method: 'GET',
         uri: 'https://rest.coinapi.io/v1/symbols',
         headers: {
@@ -206,27 +209,27 @@ app.get('/symbols/:coinName', (req, res) => {
             'X-CoinAPI-Key': API_KEY
         },
         json: true // Automatically parses the JSON string in the response
-      };
+    };
 
     let Ids = [];
     rp(options)
-      .then(function (data) {
-          data.forEach( (symbol) => {
+        .then(function (data) {
+            data.forEach( (symbol) => {
 
-            if(symbol.asset_id_base === coinName && symbol.asset_id_quote === 'USD')
-            {
-              console.log(symbol.symbol_id);
-              Ids.push({ id: symbol.symbol_id, start: symbol.data_start, end: symbol.data_end });
+                if(symbol.asset_id_base === coinName && symbol.asset_id_quote === 'USD')
+                {
+                    console.log(symbol.symbol_id);
+                    Ids.push({ id: symbol.symbol_id, start: symbol.data_start, end: symbol.data_end });
 
-            }
-          });
+                }
+            });
 
-          //console.log(data);
-           return Ids.length === 0 ? res.send('None found!') : res.json(Ids);
-      })
-      .catch(function (err) {
-          return res.send(err.message);
-      });
+            //console.log(data);
+            return Ids.length === 0 ? res.send('None found!') : res.json(Ids);
+        })
+        .catch(function (err) {
+            return res.send(err.message);
+        });
 
 });
 
