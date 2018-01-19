@@ -151,6 +151,7 @@ function callAPI(currentValueHolder) {
 }
 
 function getCurrentValues(currentValueHolder) {
+
     if (Date.now() - currentValueHolder.expirationDate > 60000) {
         console.log('Expired!');
         currentValueHolder.expirationDate = Date.now();
@@ -706,77 +707,6 @@ function updateSpecificBCH(response, id, investmentAmount, previousValue, date) 
 
 }
 
-//extra for tests
-v3Router.get('/fuckery', (req, res) => {
-
-    console.log('in callAPI');
-    let arrOfApiCalls = [];
-
-    //return Promise.resolve(currentValue);
-    // for (let x in currentValue.coinName) {
-    //     console.log('coinName');
-    //     console.log(x);
-    //     console.log('------');
-    //
-    //     arrOfApiCalls.push();
-    //
-    //
-    // }
-
-    for (let x in currentValue.coinName) {
-        console.log('coinName');
-        console.log(x);
-        console.log('------');
-
-        arrOfApiCalls.push(new Promise((resolve, reject) => {
-
-            console.log('in getSpecificCoinCurrentValueFromApi');
-
-            var currentRateOptions = {
-                method: 'GET',
-                uri: `https://min-api.cryptocompare.com/data/price?fsym=${x}&tsyms=USD`,
-                json: true // Automatically parses the JSON string in the response
-            };
-
-            return rp(currentRateOptions)
-                .then(function (data) {
-                    console.log('Price for ' + x + ' is...');
-                    console.log(data.USD);
-                    console.log('-----------');
-                    currentValue.coinName[x] = data.USD;
-                    console.log(currentValue);
-                    resolve(6);
-                    //return Promise.resolve(6);
-                    //return resolve(6);
-                })
-                .catch(function (err) {
-                    console.log(err);
-                    //return Promise.reject(err.message);
-                });
-
-
-        })
-        );
-
-    }
-
-    Promise.all(arrOfApiCalls).then((data) => {
-        console.log('promise.all');
-        console.log(data);
-        console.log('======');
-
-        res.json(data);
-    });
-
-    // Promise.all([getSpecificCoinCurrentValueFromApi('BTC'), getSpecificCoinCurrentValueFromApi('ETH')]).then((data) => {
-    //     console.log('promise.all');
-    //     console.log(data);
-    //     console.log('======');
-    //
-    //     res.json(data);
-    // });
-
-});
 
 //get all investments for a specific coin - PARAMS: [coinName]
 v3Router.get('/investments/:coinName', (req, res) => {
